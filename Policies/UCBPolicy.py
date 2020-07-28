@@ -57,7 +57,7 @@ class UCBPolicy(Policy):
 
         filter = np.logical_or(X_s, O_s)
 
-        exploit_values = value_fn.get_action_values(X_s, O_s)
+        exploit_values = value_fn.get_action_values(X_s, O_s).to('cpu').detach().numpy().squeeze()
         counters = self.counter[hashed_state]
         explore_values = np.sqrt(np.log(iteration) / counters)
         combined = exploit_values + self.c * explore_values

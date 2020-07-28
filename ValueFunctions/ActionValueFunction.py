@@ -21,6 +21,14 @@ class ActionValueFunction(ABC):
         pass
 
     @abstractmethod
+    def update_action_values(self, guess, gradient, state_hash):
+        pass
+
+    @abstractmethod
+    def reset(self,):
+        pass
+
+    @abstractmethod
     def save(self, path):
         pass
 

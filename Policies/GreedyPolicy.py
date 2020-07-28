@@ -7,7 +7,7 @@ class GreedyPolicy(Policy):
 
     def pick_action(self, value_fn: ActionValueFunction, X_s, O_s, iteration):
 
-        values = value_fn.get_action_values(X_s, O_s)
+        values = value_fn.get_action_values(X_s, O_s).to('cpu').detach().numpy().squeeze()
         filter = np.logical_or(X_s, O_s)
         values[filter] = -10000
         max_value = np.max(values)

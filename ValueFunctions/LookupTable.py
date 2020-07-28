@@ -59,7 +59,7 @@ class LookupTable(ActionValueFunction):
 
     def load(self, path):
         res = np.load('objects/' + path + '.npz', allow_pickle=True)
-        self.lookup_table = res['table']
+        self.lookup_table = res['table'].item()
 
 
 

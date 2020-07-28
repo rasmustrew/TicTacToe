@@ -17,21 +17,25 @@ def train(player_agent: Agent, opponent_agent, games, validate_each, validate_ga
     player_agent_val = BareAgent(player_policy_val, player_agent.action_value_function)
 
     opponent_agents = [opponent_agent]
+
+    current_opponent = np.random.choice(opponent_agents)
+
     for i in range(1, games + 1):
-        if i % 50000 == 0:
-            opponent_policy = GreedyPolicy()
-            opponent_value_function = copy.deepcopy(player_agent.action_value_function)
-            opponent_agent = BareAgent(opponent_policy, opponent_value_function)
-            opponent_agents.append(opponent_agent)
+        # if i % 20000 == 0:
+        #     opponent_policy = GreedyPolicy()
+        #     opponent_value_function = copy.deepcopy(player_agent.action_value_function)
+        #     opponent_agent = BareAgent(opponent_policy, opponent_value_function)
+        #     opponent_agents.append(opponent_agent)
 
         if (i % validate_each) == 0:
             print("iteration: ", i)
             validate(player_agent_val, opponent_agents, validate_games)
 
         # print("iteration: ", i)
-        current_opponent = np.random.choice(opponent_agents)
-        game = Game(player_agent, current_opponent)
+        if i % 2000 == 0:
+            current_opponent = np.random.choice(opponent_agents)
 
+        game = Game(player_agent, current_opponent)
         result = play_game(game, i)
     return opponent_agents
 

@@ -3,6 +3,7 @@ from Policies.Policy import Policy
 from ValueFunctions.ActionValueFunction import ActionValueFunction
 from Agents.Agent import Agent
 import numpy as np
+import torch
 import helpers as h
 
 class BackwardSarsaLambdaAgent(Agent):
@@ -34,23 +35,27 @@ class BackwardSarsaLambdaAgent(Agent):
         # print(action, value)
         hashed_state = Game.hash_state(X_s, O_s)
 
-        TD_error = 0
 
         if not (self.old_X_s is None):
+            # TD_target = reward + self.gamma * value
             TD_error = reward + self.gamma * value - self.old_value
 
-        for k, v in self.E.items():
-            self.E[k] = self.gamma * self.lambd * v
-            (E_X_s, E_O_s) = self.states[k]
-            old_Values = self.action_value_function.get_action_values(E_X_s, E_O_s)
-            updated_values = old_Values + self.alpha * TD_error * self.E[k]
-            self.action_value_function.set_action_values(E_X_s, E_O_s, updated_values)
+            for k, v in self.E.items():
+                self.E[k] = self.gamma * self.lambd * v
+                (E_X_s, E_O_s) = self.states[k]
+                e_hash = Game.hash_state(E_X_s, E_O_s)
+                old_values = self.action_value_function.get_action_values(E_X_s, E_O_s)
+
+                # TD_error = TD_target - old_values.detach().numpy()
+                # modifier = self.alpha * TD_error * self.E[k]
+                # updated_values = old_values + self.alpha * TD_error * self.E[k]
+                # self.action_value_function.set_action_values(E_X_s, E_O_s, updated_values)
+                self.action_value_function.update_action_values(old_values, TD_error, e_hash)
 
         if not (hashed_state in self.E):
             self.E[hashed_state] = np.zeros(X_s.shape)
             self.states[hashed_state] = (X_s.copy(), O_s.copy())
-        self.E[hashed_state][action.y, action.x] += 1
-
+        # self.E[hashed_state][action.y, action.x] += 1
         self.old_X_s = X_s.copy()
         self.old_O_s = O_s.copy()
         self.old_value = value
@@ -64,8 +69,12 @@ class BackwardSarsaLambdaAgent(Agent):
         for k, v in self.E.items():
             self.E[k] = self.gamma * self.lambd * v
             (E_X_s, E_O_s) = self.states[k]
-            updated_values = self.action_value_function.get_action_values(E_X_s, E_O_s) + self.alpha * TD_error * self.E[k]
-            self.action_value_function.set_action_values(E_X_s, E_O_s, updated_values)
+            e_hash = Game.hash_state(E_X_s, E_O_s)
+            old_values = self.action_value_function.get_action_values(E_X_s, E_O_s)
+            # updated_values = self.action_value_function.get_action_values(E_X_s, E_O_s) + self.alpha * TD_error * self.E[k]
+            # self.action_value_function.set_action_values(E_X_s, E_O_s, updated_values)
+            self.action_value_function.update_action_values(old_values, TD_error, e_hash)
+            self.action_value_function.reset()
 
         self.old_X_s = None
         self.old_O_s = None
@@ -74,4 +83,5 @@ class BackwardSarsaLambdaAgent(Agent):
         self.iteration = iteration
         self.states = {}
         self.E = {}
+
 
