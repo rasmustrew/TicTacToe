@@ -17,20 +17,20 @@ class CNN(ActionValueFunction, Module):
         self.gamma = gamma
         self.lambd = lambd
         self.e = {}
-        self.conv1 = Conv2d(3, 24, kernel_size=5, padding=2).to('cuda')
+        self.conv1 = Conv2d(3, 64, kernel_size=5, padding=2).to('cuda')
         # self.act1 = PReLU()
         self.act1 = torch.tanh
         # self.norm1 = BatchNorm2d(24).to('cuda')
-        self.conv2 = Conv2d(24, 48, kernel_size=5, padding=2).to('cuda')
+        self.conv2 = Conv2d(64, 128, kernel_size=5, padding=2).to('cuda')
         # self.act2 = PReLU()
         self.act2 = torch.tanh
         # self.norm2 = BatchNorm2d(48).to('cuda')
-        self.conv3 = Conv2d(48, 64, kernel_size=5, padding=2).to('cuda')
+        self.conv3 = Conv2d(128, 128, kernel_size=5, padding=2).to('cuda')
         # self.act3 = PReLU()
         self.act3 = torch.tanh
         # self.norm3 = BatchNorm2d(64).to('cuda')
         # self.conv_final = Conv2d(64, 1, kernel_size=3, padding=1)
-        self.dense_final = Linear(64 * 3 * 3, 9).to('cuda')
+        self.dense_final = Linear(128 * 3 * 3, 9).to('cuda')
         # self.act_final = PReLU()
         self.act_final = torch.tanh
         # self.norm_final = BatchNorm1d(1).to('cuda')
@@ -107,6 +107,7 @@ class CNN(ActionValueFunction, Module):
         guess.retain_grad()
         guess.backward(initial_gradient, retain_graph=True)
 
+
         for name, parameter in self.named_parameters():
             if not parameter.requires_grad:
                 continue
@@ -118,7 +119,6 @@ class CNN(ActionValueFunction, Module):
             for state in self.e[name].keys():
                 parameter.data -= self.alpha * error * self.e[name][state]
             parameter.grad.zero_()
-        return 1
 
 
         # with torch.no_grad():

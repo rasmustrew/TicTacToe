@@ -19,7 +19,7 @@ opponent_policy = RandomPolicy()
 opponent_value_function = None
 opponent_agent = BareAgent(opponent_policy, opponent_value_function)
 
-opponent_agents = train(player_agent_train, opponent_agent, 500001, 1000, 500)
+opponent_agents = train(player_agent_train, opponent_agent, 2001, 1000, 500)
 # player_value_function.save('SARSA_MAX_backward__UCB_vs_Self')
 print("ended training!")
 
@@ -32,7 +32,7 @@ player_agent_val = BareAgent(player_policy_val, player_value_function)
 # opponent_agent = BareAgent(opponent_policy, opponent_value_function)
 # opponent_agents = [opponent_agent]
 
-validate(player_agent_val, opponent_agents, 30001)
+validate(player_agent_val, opponent_agents, 501)
 # ## ------------------------------- ####
 #
 #
